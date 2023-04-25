@@ -1,24 +1,27 @@
 import Banner from '@/components/Banner'
 import Header from '@/components/Header'
+import MediumCard from '@/components/MediumCard'
 import SmallCard from '@/components/SmallCard'
 import Head from 'next/head'
 
 type Countries = {
-  exploreData: {
-    img: string;
-    location: string;
-    distance: string;
-  }[]
-}
+  img: string;
+  location: string;
+  distance: string;
+}[]
 
-export default function Home(exploreData: Countries) {
+type Places = {
+  img: string;
+  title: string;
+}[]
 
-  console.log(exploreData.exploreData, 'expl')
+export default function Home(
+  {exploreData,cardsData}:{exploreData: Countries, cardsData: Places}) {
 
-  return (
+    return (
     <div className=''>
       <Head>
-        <title>Create Next App</title>
+        <title>Airbnb</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
@@ -33,11 +36,19 @@ export default function Home(exploreData: Countries) {
           
           <div className='grid grid-cols-1 sm:grid-cols-2 
           lg:grid-cols-3 xl:grid-cols-4'>
-            {exploreData.exploreData.map((item, index) => (
+            {exploreData?.map((item, index) => (
               <SmallCard key={index} img={item.img} distance={item.distance} location={item.location} />
             ))}
           </div>
+        </section>
 
+        <section>
+          <h2 className='text-4xl font-semibold py-8'>Live Anywhere</h2>
+          <div className='flex space-x-3 overflow-scroll scrollbar-hide p-3 -ml-3'>
+            {cardsData?.map((item, index) => (
+              <MediumCard key={index} img={item.img} title={item.title} />
+            ))}
+          </div>
         </section>
       </main>
     </div>
@@ -45,12 +56,14 @@ export default function Home(exploreData: Countries) {
 }
 
 export async function  getStaticProps() {
-  const exploreData = await fetch('http://localhost:3001/')
-    .then(
-      (res) => res.json()
-      )
+  const exploreData = await fetch('http://localhost:3001/tiny-cards')
+    .then((res) => res.json())
+
+  const cardsData = await fetch('http://localhost:3001/medium-cards')
+    .then((res) => res.json())
 
     return { props: {
-      exploreData
+      exploreData,
+      cardsData
     }}
 }
